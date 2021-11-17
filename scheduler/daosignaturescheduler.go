@@ -10,13 +10,11 @@ import (
 	"daobackend/initclient/polygonclient"
 	"daobackend/logs"
 	"daobackend/models"
-	"daobackend/routers/signature"
 	"encoding/json"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	common2 "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/robfig/cron"
-	"github.com/shopspring/decimal"
 	"math/big"
 	"net/http"
 	"os"
@@ -41,54 +39,46 @@ func DaoSignature() {
 	c.Start()
 }
 
-func DaoSignatureService()error{
+func DaoSignatureService() error {
 	taskStatusWanted := config.GetConfig().TaskStatusDaoWanted
 	recipient := common2.HexToAddress(config.GetConfig().Recipient)
 	pk1 := os.Getenv("daoOwnerPK1")
 	pk2 := os.Getenv("daoOwnerPK2")
-	taskList,err := GetTaskListShouldBeSigService()
+	taskList, err := GetTaskListShouldBeSigService()
 	if err != nil {
 		logs.GetLogger().Error(err)
 		return err
 	}
 
-	for _,v := range taskList.Data.Deals {
+	for _, v := range taskList.Data.Deals {
 		/*if strings.ToLower(v.PayloadCid) != "bafykbzacea4cz7kz77wx6zcqajd3fykb3zwmewiggy4x33wacuwads5favmf2"{
 			continue
 		}*/
 
-		price, err :=signature.GetFileCoinLastestPriceService()
-		if err != nil {
-			logs.GetLogger().Error(err)
-			continue
-		}
-
-		if strings.Contains(strings.ToLower(taskStatusWanted),strings.ToLower(v.Status)) {
-			hasBeenSiged,err := CheckIfDealsHasBeenSiged(v)
+		if strings.Contains(strings.ToLower(taskStatusWanted), strings.ToLower(v.Status)) {
+			hasBeenSiged, err := CheckIfDealsHasBeenSiged(v)
 			if err != nil {
 				logs.GetLogger().Error(err)
 				continue
 			}
 			if !hasBeenSiged {
 				quantity := new(big.Int)
-				quantity.SetBytes([]byte(v.Cost))
-				cost,err:= decimal.NewFromString(v.Cost)
-				if err != nil {
-					logs.GetLogger().Error(err)
+				//quantity.SetBytes([]byte(v.Cost))
+				finalCost, flag := quantity.SetString(v.Cost, 10)
+				if flag != true {
 					continue
 				}
-				fee := decimal.NewFromFloat(price.Filecoin.Usd)
-				finalCost := cost.Mul(fee)
+
 				//todo dao signature 1
 				daoWalletAddress1 := common2.HexToAddress("0x05856015d07F3E24936B7D20cB3CcfCa3D34B41d") //pay for gas
-				err = doDaoSigOnContract(v.PayloadCid,v.UUID,v.DealCid,finalCost.BigInt(),recipient,true,pk1,daoWalletAddress1)
+				err = doDaoSigOnContract(v.PayloadCid, v.UUID, v.DealCid, finalCost, recipient, true, pk1, daoWalletAddress1)
 				if err != nil {
 					logs.GetLogger().Error(err)
 					continue
 				}
 				//todo dao signature 2
 				daoWalletAddress2 := common2.HexToAddress("0x6f2B76024196e82D81c8bC5eDe7cff0B0276c9C1") //pay for gas
-				err = doDaoSigOnContract(v.PayloadCid,v.UUID,v.DealCid,finalCost.BigInt(),recipient,true,pk2,daoWalletAddress2)
+				err = doDaoSigOnContract(v.PayloadCid, v.UUID, v.DealCid, finalCost, recipient, true, pk2, daoWalletAddress2)
 				if err != nil {
 					logs.GetLogger().Error(err)
 					continue
@@ -107,7 +97,7 @@ func DaoSignatureService()error{
 	return nil
 }
 
-func GetTaskListShouldBeSigService()(*models.OfflineDealResult,error){
+func GetTaskListShouldBeSigService() (*models.OfflineDealResult, error) {
 	url := config.GetConfig().GetTaskFromSwanUrl
 	response, err := httpClient.SendRequestAndGetBytes(http.MethodGet, url, nil, nil)
 	if err != nil {
@@ -123,21 +113,20 @@ func GetTaskListShouldBeSigService()(*models.OfflineDealResult,error){
 	return results, nil
 }
 
-
-func CheckIfDealsHasBeenSiged(deal *models.OfflineDeal)(bool,error){
-	dealList, err := models.FindOfflineDeals(&models.OfflineDeal{UUID:deal.UUID,DealCid: deal.DealCid,PayloadCid: deal.PayloadCid,ID: deal.ID},"id desc","10","0")
+func CheckIfDealsHasBeenSiged(deal *models.OfflineDeal) (bool, error) {
+	dealList, err := models.FindOfflineDeals(&models.OfflineDeal{UUID: deal.UUID, DealCid: deal.DealCid, PayloadCid: deal.PayloadCid, ID: deal.ID}, "id desc", "10", "0")
 	if err != nil {
 		logs.GetLogger().Error(err)
-		return true,err
+		return true, err
 	}
 	if len(dealList) > 0 {
-		return true,nil
-	}else{
-		return false,nil
+		return true, nil
+	} else {
+		return false, nil
 	}
 }
 
-func doDaoSigOnContract(cid string, orderId string, dealId string, paid *big.Int, recipient common2.Address, status bool,privateKeyOfDao string,daoWalletAccount common2.Address) error {
+func doDaoSigOnContract(cid string, orderId string, dealId string, paid *big.Int, recipient common2.Address, status bool, privateKeyOfDao string, daoWalletAccount common2.Address) error {
 	daoAddress := common2.HexToAddress(config.GetConfig().SwanDaoOralceAddress)
 	client := polygonclient.WebConn.ConnWeb
 	nonce, err := client.PendingNonceAt(context.Background(), daoWalletAccount)
@@ -175,12 +164,12 @@ func doDaoSigOnContract(cid string, orderId string, dealId string, paid *big.Int
 		return err
 	}
 
-	tx, err := daoOracleContractInstance.SignTransaction(callOpts, cid , orderId , dealId , paid , recipient , status )
+	tx, err := daoOracleContractInstance.SignTransaction(callOpts, cid, orderId, dealId, paid, recipient, status)
 	if err != nil {
 		logs.GetLogger().Error(err)
 		return err
 	}
-	logs.GetLogger().Info("dao sig tx hash: ",tx.Hash())
+	logs.GetLogger().Info("dao sig tx hash: ", tx.Hash())
 	txRecept, err := utils.CheckTx(client, tx)
 	if err != nil {
 		logs.GetLogger().Error(err)
@@ -194,5 +183,3 @@ func doDaoSigOnContract(cid string, orderId string, dealId string, paid *big.Int
 
 	return nil
 }
-
-
