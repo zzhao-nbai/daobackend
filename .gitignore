@@ -1,0 +1,49 @@
+# Directories potentially created
+build/
+develop-eggs/
+dist/
+
+*.log
+target/
+
+### macOS template
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+
+# Environments
+config.toml
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+.idea
+.idea/
+
+# The project's config file
+config.toml
+config.json
+conf.toml
+conf.json
+config_*.toml
+
+
+
