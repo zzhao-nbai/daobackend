@@ -17,8 +17,8 @@ import (
 	"strings"
 )
 
-func GetTaskListShouldBeSigService()(*models.OfflineDealResult,error){
-	url := config.GetConfig().GetTaskFromSwanUrl
+func GetTaskListShouldBeSigService() (*models.OfflineDealResult, error) {
+	url := config.GetConfig().GetDealsFromPaymentGatewayUrl
 	response, err := httpClient.SendRequestAndGetBytes(http.MethodGet, url, nil, nil)
 	if err != nil {
 		logs.GetLogger().Error(err)
@@ -33,7 +33,7 @@ func GetTaskListShouldBeSigService()(*models.OfflineDealResult,error){
 	return results, nil
 }
 
-func doDaoSigOnContract(cid string, orderId string, dealId string, paid *big.Int, recipient common.Address, terms *big.Int, status bool,privateKeyOfDao string,daoWalletAccount common.Address) error {
+func doDaoSigOnContract(cid string, orderId string, dealId string, paid *big.Int, recipient common.Address, terms *big.Int, status bool, privateKeyOfDao string, daoWalletAccount common.Address) error {
 	daoAddress := common.HexToAddress(config.GetConfig().SwanDaoOralceAddress)
 	client := polygonclient.WebConn.ConnWeb
 	nonce, err := client.PendingNonceAt(context.Background(), daoWalletAccount)
@@ -71,25 +71,25 @@ func doDaoSigOnContract(cid string, orderId string, dealId string, paid *big.Int
 		return err
 	}
 
-	tx, err := daoOracleContractInstance.SignTransaction(callOpts, cid , orderId , dealId , paid , recipient , status )
+	tx, err := daoOracleContractInstance.SignTransaction(callOpts, cid, dealId, recipient)
 	if err != nil {
 		logs.GetLogger().Error(err)
 		return err
 	}
-    logs.GetLogger().Info("dao sig tx hash: ",tx.Hash())
+	logs.GetLogger().Info("dao sig tx hash: ", tx.Hash())
 	return nil
 }
 
-func CheckIfDealsHasBeenSiged(deal *models.OfflineDeal)(bool,error){
-	dealList, err := models.FindOfflineDeals(&models.OfflineDeal{UUID:deal.UUID,DealCid: deal.DealCid,PayloadCid: deal.PayloadCid,ID: deal.ID},"id desc","10","0")
+func CheckIfDealsHasBeenSiged(deal *models.OfflineDeal, daoWalletAddress string) (bool, error) {
+	dealList, err := models.FindOfflineDeals(&models.OfflineDeal{DealId: deal.DealId, DaoAddress: daoWalletAddress}, "id desc", "10", "0")
 	if err != nil {
 		logs.GetLogger().Error(err)
-		return true,err
+		return true, err
 	}
 	if len(dealList) > 0 {
-		return true,nil
-	}else{
-		return false,nil
+		return true, nil
+	} else {
+		return false, nil
 	}
 }
 

@@ -46,4 +46,7 @@ const (
 	SIGNATURE_FAILED_VALUE  = "2" //init value,no unlock operation has been performed
 
 	SOURCE_ID_OF_PAYMENT = 4
+
+	DAO_SIGN_STATUS_SUCCESS = "Success"
+	DAO_SIGN_STATUS_FAIL    = "Fail"
 )

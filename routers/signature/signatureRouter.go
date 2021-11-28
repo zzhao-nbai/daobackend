@@ -1,18 +1,8 @@
 package signature
 
 import (
-	"daobackend/common"
 	"daobackend/common/constants"
-	"daobackend/common/errorinfo"
-	"daobackend/config"
-	"daobackend/database"
-	"daobackend/logs"
-	common2 "github.com/ethereum/go-ethereum/common"
 	"github.com/gin-gonic/gin"
-	"math/big"
-	"net/http"
-	"os"
-	"strings"
 )
 
 func SignatureManager(router *gin.RouterGroup) {
@@ -20,7 +10,7 @@ func SignatureManager(router *gin.RouterGroup) {
 }
 
 func GetTaskListShouldBeSig(c *gin.Context) {
-	taskStatusWanted := config.GetConfig().TaskStatusDaoWanted
+	/*taskStatusWanted := config.GetConfig().TaskStatusDaoWanted
 	recipient := common2.HexToAddress(config.GetConfig().Recipient)
 	pk1 := os.Getenv("daoOwnerPK1")
 	pk2 := os.Getenv("daoOwnerPK2")
@@ -66,5 +56,5 @@ func GetTaskListShouldBeSig(c *gin.Context) {
 			}
 		}
 	}
-	c.JSON(http.StatusOK, common.CreateSuccessResponse(taskList))
+	c.JSON(http.StatusOK, common.CreateSuccessResponse(taskList))*/
 }

@@ -7,16 +7,17 @@ import (
 )
 
 type Configuration struct {
-	Port                 string
-	Database             database
-	Dev                  bool
-	GetTaskFromSwanUrl   string //pay for gas
-	TaskStatusDaoWanted  string
-	RpcUrlPolygon        string
-	SwanDaoOralceAddress string
-	GasLimit             uint64
-	Recipient            string
-	DaoSignatureRule     string
+	Port                           string
+	Database                       database
+	Dev                            bool
+	GetDealsFromPaymentGatewayUrl  string
+	UpdateDealsToPaymentGatewayUrl string
+	TaskStatusDaoWanted            string
+	RpcUrlPolygon                  string
+	SwanDaoOralceAddress           string
+	GasLimit                       uint64
+	Recipient                      string
+	DaoSignatureRule               string
 }
 
 type database struct {
