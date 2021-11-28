@@ -66,7 +66,7 @@ func DaoSignatureService() error {
 			hasBeenSiged1 = true
 		}
 		if !hasBeenSiged1 {
-			txHash1, err := doDaoSigOnContract(v.PayloadCid, v.DealCid, recipient, pk1, daoWalletAddress1)
+			txHash1, err := doDaoSigOnContract(v.PayloadCid, v.DealId, recipient, pk1, daoWalletAddress1)
 			if err != nil {
 				signStatus = constants.DAO_SIGN_STATUS_FAIL
 				logs.GetLogger().Error(err)
@@ -85,7 +85,7 @@ func DaoSignatureService() error {
 			hasBeenSiged2 = true
 		}
 		if !hasBeenSiged2 {
-			txHash2, err := doDaoSigOnContract(v.PayloadCid, v.DealCid, recipient, pk2, daoWalletAddress2)
+			txHash2, err := doDaoSigOnContract(v.PayloadCid, v.DealId, recipient, pk2, daoWalletAddress2)
 			if err != nil {
 				signStatus = constants.DAO_SIGN_STATUS_FAIL
 				logs.GetLogger().Error(err)
@@ -104,7 +104,7 @@ func DaoSignatureService() error {
 			hasBeenSiged3 = true
 		}
 		if !hasBeenSiged3 {
-			txHash3, err := doDaoSigOnContract(v.PayloadCid, v.DealCid, recipient, pk3, daoWalletAddress3)
+			txHash3, err := doDaoSigOnContract(v.PayloadCid, v.DealId, recipient, pk3, daoWalletAddress3)
 			if err != nil {
 				signStatus = constants.DAO_SIGN_STATUS_FAIL
 				logs.GetLogger().Error(err)
@@ -197,7 +197,7 @@ func CheckIfDealsHasBeenSigned(deal *models.OfflineDeal, daoWalletAddress string
 	}
 }
 
-func doDaoSigOnContract(cid string, dealId string, recipient common2.Address, privateKeyOfDao string, daoWalletAccount common2.Address) (string, error) {
+func doDaoSigOnContract(cid string, dealId int64, recipient common2.Address, privateKeyOfDao string, daoWalletAccount common2.Address) (string, error) {
 	daoAddress := common2.HexToAddress(config.GetConfig().SwanDaoOralceAddress)
 	client := polygonclient.WebConn.ConnWeb
 	nonce, err := client.PendingNonceAt(context.Background(), daoWalletAccount)
@@ -235,7 +235,7 @@ func doDaoSigOnContract(cid string, dealId string, recipient common2.Address, pr
 		return "", err
 	}
 
-	tx, err := daoOracleContractInstance.SignTransaction(callOpts, cid, dealId, recipient)
+	tx, err := daoOracleContractInstance.SignTransaction(callOpts, cid, strconv.FormatInt(dealId, 10), recipient)
 	if err != nil {
 		logs.GetLogger().Error(err)
 		return "", err
