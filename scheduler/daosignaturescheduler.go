@@ -76,7 +76,7 @@ func DaoSignatureService() error {
 				logs.GetLogger().Error(err)
 			}
 		}
-
+		time.Sleep(10 * time.Second)
 		//todo dao signature 2
 		daoWalletAddress2 := common2.HexToAddress("0x6f2B76024196e82D81c8bC5eDe7cff0B0276c9C1") //pay for gas
 		hasBeenSiged2, err := CheckIfDealsHasBeenSigned(v, daoWalletAddress2.Hex())
@@ -95,7 +95,7 @@ func DaoSignatureService() error {
 				logs.GetLogger().Error(err)
 			}
 		}
-
+		time.Sleep(20 * time.Second)
 		//todo dao signature 3
 		daoWalletAddress3 := common2.HexToAddress("0x800210CfB747992790245eA878D32F188d01a03A") //pay for gas
 		hasBeenSiged3, err := CheckIfDealsHasBeenSigned(v, daoWalletAddress3.Hex())

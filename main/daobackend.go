@@ -24,8 +24,8 @@ func main() {
 
 	// init database
 	db := database.Init()
-	scheduler.DaoSignatureService()
-	//scheduler.DaoSignature()
+	//scheduler.DaoSignatureService()
+	scheduler.DaoSignature()
 
 	defer func() {
 		err := db.Close()
