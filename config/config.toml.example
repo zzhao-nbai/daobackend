@@ -1,11 +1,12 @@
 port="8899"
 dev = true
-#daoSignatureRule = "0 */3 * * * ?"  #every minute
-daoSignatureRule = "0/50 * * * * *"
-getTaskFromSwanUrl="http://192.168.88.216:5002/paymentgateway/deals?offset=0&limit=30&source_id=4&status=Waiting,ReadyForImport,FileImported,DealActive,Completed&is_public=1"
-taskStatusDaoWanted="Waiting,ReadyForImport,FileImported,DealActive,Completed" #prod  environment value:DealActive,Completed
+daoSignatureRule = "0 */3 * * * ?"  #every minute
+#daoSignatureRule = "0/50 * * * * *"
+getDealsFromPaymentGatewayUrl="http://192.168.88.41:8889/api/v1/storage/dao/signature/deals"
+updateDealsToPaymentGatewayUrl="http://192.168.88.41:8889/api/v1/storage/dao/signature/deals"
+#updateDealsToPaymentGatewayUrl="http://127.0.0.1:8888/api/v1/storage/dao/signature/deals"
 #rpcUrlPolygon = "https://polygon-mumbai.g.alchemy.com/v2/86HeefA3O9EF22t2NTLbmcpfN0hb9vlv"
-rpcUrlPolygon = "https://rpc-mumbai.maticvigil.com/"
+rpcUrlPolygon = "https://polygon-mumbai.g.alchemy.com/v2/86HeefA3O9EF22t2NTLbmcpfN0hb9vlv"
 swanDaoOralceAddress = "0xe3262c0848b0cc5cd43df7139103f1fbf26558cc"
 recipient = "0xc4fcaAdCb0b00a9501e56215c37B10fAF9e79c0a"
 gasLimit = 800000
